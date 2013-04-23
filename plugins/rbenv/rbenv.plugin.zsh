@@ -6,15 +6,16 @@ _rbenv-from-homebrew-installed() {
   brew --prefix rbenv &> /dev/null
 }
 
-FOUND_RBENV=0
-rbenvdirs=("$HOME/.rbenv" "/usr/local/rbenv" "/opt/rbenv")
+export FOUND_RBENV=0
 if _homebrew-installed && _rbenv-from-homebrew-installed ; then
     rbenvdirs=($(brew --prefix rbenv) "${rbenvdirs[@]}")
 fi
 
+rbenvdirs=("$HOME/.rbenv")
+
 for rbenvdir in "${rbenvdirs[@]}" ; do
   if [ -d $rbenvdir/bin -a $FOUND_RBENV -eq 0 ] ; then
-    FOUND_RBENV=1
+    export FOUND_RBENV=1
     export RBENV_ROOT=$rbenvdir
     export PATH=${rbenvdir}/bin:$PATH
     eval "$(rbenv init - zsh)"
@@ -27,7 +28,7 @@ for rbenvdir in "${rbenvdirs[@]}" ; do
     }
 
     function current_gemset() {
-      echo "$(rbenv gemset active 2&>/dev/null | sed -e ":a" -e '$ s/\n/+/gp;N;b a' | head -n1)"
+      echo "$(rbenv gemset active 2>/dev/null | sed -E -n -e "s/^(.*) .+$/\1/" -e p))"
     }
 
     function gems {
