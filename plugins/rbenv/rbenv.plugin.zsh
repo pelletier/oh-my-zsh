@@ -37,7 +37,7 @@ if [ $FOUND_RBENV -eq 1 ]; then
     }
 
     function current_gemset() {
-      echo "$(rbenv gemset active 2>/dev/null | sed -E -n -e "s/^(.*) .+$/\1/" -e p))"
+      echo "$(rbenv gemset active 2>/dev/null | sed -E -n -e "s/^(.*) .+$/\1/" -e p)"
     }
 
     function gems {
