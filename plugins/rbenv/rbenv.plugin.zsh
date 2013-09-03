@@ -11,13 +11,22 @@ if _homebrew-installed && _rbenv-from-homebrew-installed ; then
     rbenvdirs=($(brew --prefix rbenv) "${rbenvdirs[@]}")
 fi
 
-rbenvdirs=("$HOME/.rbenv")
 
-for rbenvdir in "${rbenvdirs[@]}" ; do
-  if [ -d $rbenvdir/bin -a $FOUND_RBENV -eq 0 ] ; then
+# Check if Rbenv is already available in the PATH
+if which rbenv > /dev/null; then
     export FOUND_RBENV=1
-    export RBENV_ROOT=$rbenvdir
-    export PATH=${rbenvdir}/bin:$PATH
+else
+    rbenvdirs=("$HOME/.rbenv")
+    for rbenvdir in "${rbenvdirs[@]}" ; do
+        if [ -d $rbenvdir/bin -a $FOUND_RBENV -eq 0 ] ; then
+            export FOUND_RBENV=1
+            export RBENV_ROOT=$rbenvdir
+            export PATH=${rbenvdir}/bin:$PATH
+        fi
+    done
+fi
+
+if [ $FOUND_RBENV -eq 1 ]; then
     eval "$(rbenv init - zsh)"
 
     alias rubies="rbenv versions"
@@ -47,8 +56,8 @@ for rbenvdir in "${rbenvdirs[@]}" ; do
         echo "$(current_ruby)"
       fi
     }
-  fi
-done
+fi
+
 unset rbenvdir
 
 if [ $FOUND_RBENV -eq 0 ] ; then
